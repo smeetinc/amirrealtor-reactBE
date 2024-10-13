@@ -11,7 +11,7 @@ const getAllHomes = asyncHandler(async (req, res) => {
 
   // If no homes
   if (!homes?.length) {
-    return res.status(400).json({ message: "No homes found" });
+    return res.status(400).json({ message: "No homes found at the moment" });
   }
   return res.status(200).json({ homes });
 });
