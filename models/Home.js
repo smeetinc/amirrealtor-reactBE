@@ -8,15 +8,30 @@ const homeSchema = new mongoose.Schema(
       trim: true,
       maxLength: [200, "Home name cannot exceed 100 characters"],
     },
-    description: {
+    description: [
+      {
+        content: {
+          type: String,
+          required: [true, "Please enter home name"],
+        },
+      },
+    ],
+    amenities: [
+      {
+        name: {
+          type: String,
+        },
+      },
+    ],
+    area: {
       type: String,
-      required: [true, "Please enter home name"],
+      required: [true, "Please enter home area"],
     },
     bedrooms: {
       type: Number,
       required: [true, "Please enter number of bedrooms"],
     },
-    bathrooms: {
+    bathroom: {
       type: Number,
       required: [true, "Please enter number of bathrooms"],
     },
@@ -24,12 +39,11 @@ const homeSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please enter home size"],
     },
-    propertyType: [
-      {
-        type: String,
-        required: [true, "Please enter property type"],
-      },
-    ],
+    propertyType: {
+      type: String,
+      required: [true, "Please enter property type"],
+    },
+
     pricePerYearRent: {
       type: Number,
       required: [true, "Please enter home price per year rent"],
@@ -83,10 +97,6 @@ const homeSchema = new mongoose.Schema(
     category: {
       type: String,
       required: [true, "Please enter home category"],
-      enum: {
-        values: ["New Listing", "Economy", "Luxury"],
-        message: "Please select correct category for home",
-      },
     },
     reviews: [
       {

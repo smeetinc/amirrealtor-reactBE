@@ -41,6 +41,7 @@ const getHomeDetails = asyncHandler(async (req, res) => {
 // @route POST /homes
 // @access Private
 const createNewHome = asyncHandler(async (req, res) => {
+  console.log("Console from post request => ", req.body);
   const {
     name,
     description,
@@ -59,6 +60,8 @@ const createNewHome = asyncHandler(async (req, res) => {
     reviews,
     owner,
     user,
+    area,
+    amenities,
   } = req.body;
 
   // Confirm data
@@ -74,7 +77,9 @@ const createNewHome = asyncHandler(async (req, res) => {
     !pricePerYearRent ||
     !address ||
     !images ||
-    !category
+    !category ||
+    !area ||
+    !amenities
   ) {
     return res.status(400).json({ message: "All fields are required" });
   }
@@ -105,6 +110,8 @@ const createNewHome = asyncHandler(async (req, res) => {
     reviews,
     owner,
     user,
+    area,
+    amenities,
   });
 
   if (home) {
@@ -235,18 +242,18 @@ const deleteHome = asyncHandler(async (req, res) => {
 // @route GET /homes/search
 // @access Private
 const searchHomes = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10, ...searchParams } = req.query;
+  const { page = 1, limit = 10, search } = req.query;
 
-  // Build search filters from query params
+  // Build search filters from a general search query
   const query = {};
-  if (searchParams.name) {
-    query.name = { $regex: searchParams.name, $options: "i" }; // Case-insensitive search for name
-  }
-  if (searchParams.location) {
-    query.location = { $regex: searchParams.location, $options: "i" };
-  }
-  if (searchParams.propertyType) {
-    query.propertyType = searchParams.propertyType;
+  if (search) {
+    query.$or = [
+      { name: { $regex: search, $options: "i" } }, // Case-insensitive search for name
+      { location: { $regex: search, $options: "i" } }, // Case-insensitive search for location
+      { address: { $regex: search, $options: "i" } }, // Case-insensitive search for address
+      { category: { $regex: search, $options: "i" } }, // Case-insensitive search for category
+      { propertyType: { $regex: search, $options: "i" } }, // Case-insensitive search for propertyType
+    ];
   }
 
   // Pagination logic
@@ -254,7 +261,6 @@ const searchHomes = asyncHandler(async (req, res) => {
 
   // Fetch homes with pagination and filters
   const homes = await Home.find(query).limit(Number(limit)).skip(skip).lean();
-
   const totalHomes = await Home.countDocuments(query);
 
   return res.status(200).json({
